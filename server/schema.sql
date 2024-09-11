@@ -1,0 +1,12 @@
+CREATE DATABASE chartlab_app;
+USE chartlab_app;
+
+CREATE TABLE charts (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  title VARCHAR(255) NOT NULL,
+  style VARCHAR(50) NOT NULL,
+  x_label VARCHAR(255) NOT NULL,
+  y_label VARCHAR(255) NOT NULL,
+  allValues TEXT NOT NULL,
+  created TIMESTAMP NOT NULL DEFAULT NOW()
+);
