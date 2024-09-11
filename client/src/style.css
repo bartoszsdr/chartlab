@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+}
+
+html {
+	font-size: 62.5%;
+	scroll-behavior: smooth;
+	color: white;
+}
+
+body {
+	font-family: 'Inter', sans-serif;
+	line-height: 1.75;
+	min-height: 100vh;
+	font-size: 1.6rem;
+	color: #000;
+	background-color: #454d55;
+}
+
+a,
+button,
+input,
+select {
+	font-family: inherit;
+}
+
+button {
+	padding: 0.75em 1.5em;
+	border: none;
+	border-radius: 5px;
+	transition: background-color 0.1s, color 0.1s;
+	font-size: 1.6rem;
+	cursor: pointer;
+}
+
+button:hover {
+	background-color: #bdbdbd;
+}
+
+h1 {
+	font-size: 2.4rem;
+}
+
+h2 {
+	font-size: 2rem;
+}
+
+h3 {
+	font-size: 1.8rem;
+	font-weight: normal;
+}
+
+.wrapper {
+	max-width: 1280px;
+	margin: 0 auto;
+	padding: 1em;
+}
