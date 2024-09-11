@@ -62,8 +62,8 @@ const createChart = () => {
 			type: props.style,
 			data: {
 				labels: props.data.length > 0 ? props.data[0].labels : [],
-				datasets: props.data.map((dataset, index) => ({
-					label: `${dataset.names} ${index + 1}`,
+				datasets: props.data.map(dataset => ({
+					label: dataset.names,
 					data: dataset.data,
 				})),
 			},

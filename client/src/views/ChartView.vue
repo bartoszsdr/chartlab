@@ -41,8 +41,8 @@ const createChart = chart => {
 			type: chart.style,
 			data: {
 				labels: valuesObject.length > 0 ? valuesObject[0].labels : [],
-				datasets: valuesObject.map((dataset, index) => ({
-					label: `${dataset.names} ${index + 1}`,
+				datasets: valuesObject.map(dataset => ({
+					label: dataset.names,
 					data: dataset.data,
 				})),
 			},
