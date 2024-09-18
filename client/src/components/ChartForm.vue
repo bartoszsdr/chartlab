@@ -7,24 +7,26 @@
 			<div class="form__upper">
 				<div class="form__input">
 					<label for="title">Tytuł wykresu: <span class="form__req">*</span> </label>
-					<input id="title" v-model="titleInput" type="text" placeholder="np. Produkcja w czasie" required />
+					<input id="title" v-model="titleInput" type="text" placeholder="np. Dzienny opad deszczu" required />
 				</div>
 				<div class="form__input">
 					<label for="pet-select">Rodzaj wykresu: <span class="form__req">*</span></label>
 					<select name="pets" id="pet-select" v-model="styleSelect" @change="handleStyleSelect">
 						<option value="auto">automatycznie</option>
-						<option value="line">liniowy</option>
 						<option value="bar">słupkowy</option>
-						<option value="pie">pie</option>
+						<option value="line">liniowy</option>
+						<option value="pie">kołowy</option>
+						<option value="scatter">punktowy</option>
+						<!-- <option value="radar">radarowy</option> -->
 					</select>
 				</div>
 				<div class="form__input">
 					<label for="xLabel">Nazwa osi X:</label>
-					<input id="xLabel" v-model="xLabelInput" type="text" placeholder="np. Czas" />
+					<input id="xLabel" v-model="xLabelInput" type="text" placeholder="np. h" />
 				</div>
 				<div class="form__input">
 					<label for="yLabel">Nazwa osi Y:</label>
-					<input id="yLabel" v-model="yLabelInput" type="text" placeholder="np. Ilość" />
+					<input id="yLabel" v-model="yLabelInput" type="text" placeholder="np. mm" />
 				</div>
 			</div>
 			<!-- <hr class="form__divider" /> -->
@@ -39,25 +41,25 @@
 						:id="'name' + index"
 						v-model="datasetInput.nameInput"
 						type="text"
-						placeholder="np. Procesory"
+						placeholder="np. Opad (mm/h)"
 						required />
 				</div>
 				<div class="form__input">
-					<label :for="'xValues' + index">Wartości X: <span class="form__req">*</span></label>
+					<label :for="'xValues' + index">Kategorie (oś X): <span class="form__req">*</span></label>
 					<input
 						:id="'xValues' + index"
 						v-model="datasetInput.xValuesInput"
 						type="text"
-						placeholder="np. Styczeń, Luty"
+						placeholder="np. 6:00, 14:00, 22:00"
 						required />
 				</div>
 				<div class="form__input">
-					<label :for="'yValues' + index">Wartości Y: <span class="form__req">*</span></label>
+					<label :for="'yValues' + index">Wartości (oś Y): <span class="form__req">*</span></label>
 					<input
 						:id="'yValues' + index"
 						v-model="datasetInput.yValuesInput"
 						type="text"
-						placeholder="np. 220, 194"
+						placeholder="np. 0, 3, 2"
 						required />
 				</div>
 			</div>
@@ -97,30 +99,41 @@ const removeDataset = index => {
 	datasetsInput.value.splice(index, 1)
 }
 
-const handleStyleSelect = () => {
-	console.log('Wybrany typ wykresu:', styleSelect.value)
-}
-
 const autoSelectChartStyle = () => {
-	if (datasetsInput.value.length === 0) {
-		styleSelect.value = 'bar' // Domyślny typ, jeśli brak danych
-		return
-	}
-
-	// Weź pierwszy zestaw danych jako reprezentatywny
 	const firstDataset = datasetsInput.value[0]
 	const labels = firstDataset.xValuesInput.split(',').map(label => label.trim())
+	const labelsAreStrings = firstDataset.xValuesInput.split(',').map(Number).some(Number.isNaN)
 	const data = firstDataset.yValuesInput.split(',').map(Number)
 
-	// Wybieramy typ wykresu w zależności od ilości danych
-	if (data.length > 20) {
-		styleSelect.value = 'line' // Dużo danych -> wykres liniowy
-	} else if (labels.length > 1 && data.every(value => value >= 0)) {
-		styleSelect.value = 'bar' // Niewielka ilość danych dodatnich -> wykres słupkowy
-	} else if (labels.length === 1) {
-		styleSelect.value = 'pie' // Jedna kategoria -> wykres kołowy
+	if (datasetsInput.value.length === 1) {
+		// ONE DATASET LOGIC
+		if (labels.length === 1 && data.length <= 5 && data.every(value => value >= 0)) {
+			// Choose pie chart if there is only one X value, less or equal than 5 Y values and all Y values are > 0.
+			styleSelect.value = 'pie'
+		} else if (labels.length === data.length && labels.length <= 12 && labelsAreStrings) {
+			// Choose bar chart if there is the same amount of X and Y values, less or equal than 12 X values and X values are not numbers.
+			styleSelect.value = 'bar'
+		} else if (labels.length === data.length && labels.length > 12 && labelsAreStrings) {
+			// Choose line chart if there is the same amount of X and Y values, more than 12 X values and X values are not numbers.
+			styleSelect.value = 'line'
+		} else if (!labelsAreStrings) {
+			// Choose scatter chart if X values are numbers.
+			styleSelect.value = 'scatter'
+		} else {
+			// Choose bar chart in any other scenario.
+			styleSelect.value = 'bar'
+		}
 	} else {
-		styleSelect.value = 'scatter' // W innym przypadku -> wykres punktowy
+		// MORE DATASETS LOGIC
+		if (labels.length === data.length && labels.length <= 12 && labelsAreStrings) {
+			styleSelect.value = 'bar'
+		} else if (labels.length === data.length && labels.length > 12 && labelsAreStrings) {
+			styleSelect.value = 'line'
+		} else if (!labelsAreStrings) {
+			styleSelect.value = 'scatter'
+		} else {
+			styleSelect.value = 'bar'
+		}
 	}
 
 	console.log(`Wybrano typ wykresu: ${styleSelect.value}`)
